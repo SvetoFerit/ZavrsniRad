@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.sveto.zavrsnirad.SplashActivity">
+
+    <ImageView
+        android:id="@+id/SplashLogo"
+        android:layout_width="match_parent"
+        android:layout_height="200sp"
+        android:layout_alignParentTop="true"
+        android:src="@drawable/feritos" />
+
+    <ImageView
+        android:id="@+id/SplashFitbitLogo"
+        android:layout_width="match_parent"
+        android:layout_height="150sp"
+        android:layout_below="@+id/tvSplash"
+        android:layout_marginTop="50sp"
+        android:src="@drawable/fitbit" />
+
+    <TextView
+        android:id="@+id/tvSplash"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:text="@string/SplashActivityText"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="40sp" />
+
+
+</RelativeLayout>
