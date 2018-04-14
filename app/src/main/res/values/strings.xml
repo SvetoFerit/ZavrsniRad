@@ -1,4 +1,22 @@
 <resources>
+    <!--RegisterActivity-->
     <string name="app_name">ZavrsniRad</string>
     <string name="SplashActivityText">Dobrodošli!</string>
+    <string name="HintPassword">Password</string>
+    <string name="HintEmail">Email</string>
+    <string name="ButtonLogin">log in</string>
+    <string name="ButtonSignUpRegisterActivity">New User? sign up!</string>
+    <string name="CheckBox">Remember me</string>
+    <string name="tvForgotPassword">Forgot password?</string>
+
+    <!--SignUpActivity-->
+    <string name="tvSignUp">Sign up</string>
+    <string name="HintUsernameSignUp">Username</string>
+    <string name="HintPasswordSignUp">Password</string>
+    <string name="HintEmailSignUp">Email</string>
+    <string name="HintConfirmPassword">Confirm Password</string>
+    <string name="ButtonSignUpActivity">sign up</string>
+    <string name="tvAlreadySignUp">Already Sign Up? Log In</string>
+
+
 </resources>
