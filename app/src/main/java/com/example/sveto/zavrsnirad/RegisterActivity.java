@@ -78,6 +78,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         if (email.equals(extra_Email) && password.equals(extra_Password)) {
             result = true;
+        } else if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Please enter all the details", Toast.LENGTH_SHORT).show();
         } else if (!email.equals(extra_Email) && !password.equals(extra_Password)) {
             Toast.makeText(this, "Incorrect email and password!", Toast.LENGTH_SHORT).show();
         } else if (!email.equals(extra_Email)) {
