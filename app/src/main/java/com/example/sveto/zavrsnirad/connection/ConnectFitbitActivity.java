@@ -35,8 +35,7 @@ public class ConnectFitbitActivity extends AppCompatActivity implements View.OnC
     ListView lvDevices;
 
     private BluetoothAdapter bluetoothAdapter;
-
-    public static final int REQUEST_ENABLE_BT = 1;
+    
     public static final int DISCOVERY_REQUEST = 1;
 
 
