@@ -87,19 +87,17 @@ public class ConnectFitbitActivity extends AppCompatActivity implements View.OnC
     }
 
 
-
-
     public void connectToFitbit() {
 
         Log.e("List", "List");
-        bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         String scanModeChanged = BluetoothAdapter.ACTION_SCAN_MODE_CHANGED;
         String beDiscoverable = BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE;
         IntentFilter filter = new IntentFilter(scanModeChanged);
         registerReceiver(bluetoothState, filter);
         startActivityForResult(new Intent(beDiscoverable), DISCOVERY_REQUEST);
 
-        Log.e("ispiši","ispiši");
+        Log.e("ispiši", "ispiši");
     }
 
 
