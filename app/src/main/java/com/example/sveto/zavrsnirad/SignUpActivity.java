@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.example.sveto.zavrsnirad.database.UserDbHelper;
 import com.example.sveto.zavrsnirad.models.User;
+import com.example.sveto.zavrsnirad.utils.PreferenceUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,10 +38,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     UserDbHelper userDbHelper;
 
     String username, email, password, confirmpassword;
-
-    public static final String EXTRA_EMAIL = "extraEmail";
-    public static final String EXTRA_PASSWORD = "extraPassword";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,27 +73,37 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         switch (v.getId()) {
             case R.id.button:
                 if (validate()) {
+                    boolean adduser = false;
+                    int count = 0;
                     User user = new User(username, email, password);
                     Cursor cursor = userDbHelper.getUser();
                     if (cursor.getCount() == 0) {
-                        boolean adduser = userDbHelper.addUser(user);
-                    }
-                    while (cursor.moveToNext()) {
-                        if (email.equals(cursor.getString(2)) || password.equals(cursor.getString(3))) {
-                            Toast.makeText(this, "User already exists! ", Toast.LENGTH_SHORT).show();
+                        adduser = userDbHelper.addUser(user);
+                    } else {
+                        while (cursor.moveToNext()) {
+
+                            if (email.equals(cursor.getString(2)) || password.equals(cursor.getString(3))) {
+                                count++;
+                            }
                         }
                     }
-                    boolean adduser = userDbHelper.addUser(user);
+                    if (count == 0) {
+                        adduser = userDbHelper.addUser(user);
+                    } else {
+                        Toast.makeText(this, "User already exists!", Toast.LENGTH_SHORT).show();
+                        break;
+                    }
 
                     if (adduser) {
                         Toast.makeText(this, "You are successfully signed up", Toast.LENGTH_SHORT).show();
                         Log.e("insert", "inserted");
                         Log.e("USER", user.getEmail());
-                        Intent intent = new Intent(this, RegisterActivity.class);
-                        intent.putExtra(EXTRA_EMAIL, email);
-                        intent.putExtra(EXTRA_PASSWORD, password);
-                        startActivity(intent);
+                        PreferenceUtils.clearHeightPreference(SignUpActivity.this);
+                        PreferenceUtils.clearCounterPreference(SignUpActivity.this);
+                        startActivity(new Intent(SignUpActivity.this, RegisterActivity.class));
                     } else {
+
+
                         Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
                     }
                 }

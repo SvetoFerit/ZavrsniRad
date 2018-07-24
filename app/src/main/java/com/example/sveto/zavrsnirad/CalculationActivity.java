@@ -1,25 +1,26 @@
 package com.example.sveto.zavrsnirad;
 
 import android.app.ProgressDialog;
-import android.content.Context;
+
 import android.content.Intent;
-import android.content.SharedPreferences;
+
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+
+import android.os.Handler;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.sveto.zavrsnirad.Utils.FitbitUtils;
-import com.example.sveto.zavrsnirad.Utils.PreferenceUtils;
-import com.example.sveto.zavrsnirad.Utils.TextViewSyncCallback;
+import com.example.sveto.zavrsnirad.utils.FitbitUtils;
+import com.example.sveto.zavrsnirad.utils.PreferenceUtils;
+import com.example.sveto.zavrsnirad.utils.TextViewSyncCallback;
 import com.example.sveto.zavrsnirad.connection.ConnectFitbitActivity;
 import com.example.sveto.zavrsnirad.models.FitbitParameters;
 
@@ -61,15 +62,11 @@ public class CalculationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_calculation);
         ButterKnife.bind(this);
 
-        Log.e("Create", "create");
-        setSupportActionBar(toolbar);
 
         navHeader = navView.getHeaderView(0);
         txtName = navHeader.findViewById(R.id.name);
         txtName = navHeader.findViewById(R.id.name);
         txtWebsite = navHeader.findViewById(R.id.website);
-
-        setToolbarTitle();
 
         loadNavHeader();
         setUpNavigationView();
@@ -83,14 +80,8 @@ public class CalculationActivity extends AppCompatActivity {
     }
 
 
-    private void setToolbarTitle() {
-        getSupportActionBar().setTitle("mob app");
-    }
-
     private void setUpNavigationView() {
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
-            // This method will trigger on item Click of navigation menu
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
 
@@ -101,23 +92,24 @@ public class CalculationActivity extends AppCompatActivity {
                         progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                         progressBar.setProgress(3);
                         progressBar.show();
-                        drawerLayout.closeDrawers();
-                        long delayInMillis = 3000;
-                        Timer timer = new Timer();
-                        timer.schedule(new TimerTask() {
+                        final Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 progressBar.dismiss();
+                                Toast.makeText(CalculationActivity.this, "You are successfully synced", Toast.LENGTH_SHORT).show();
+                                drawerLayout.closeDrawers();
+                                syncFitbit();
                             }
-                        }, delayInMillis);
-                        syncFitbit();
+                        }, 3000);
+
                         break;
                     case R.id.nav_set_weight_and_height:
-                        clearHeightPreference(CalculationActivity.this);
+                        PreferenceUtils.clearHeightPreference(CalculationActivity.this);
                         startActivity(new Intent(CalculationActivity.this, UserBodyParameters.class));
                         break;
                     case R.id.nav_logout:
-                        clearEmailPreference(CalculationActivity.this);
+                        PreferenceUtils.clearEmailPreference(CalculationActivity.this);
                         startActivity(new Intent(CalculationActivity.this, RegisterActivity.class));
                         return true;
 
@@ -212,22 +204,6 @@ public class CalculationActivity extends AppCompatActivity {
         });
 
     }
-
-    public void clearHeightPreference(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefsEditor = preferences.edit();
-        prefsEditor.remove(PreferenceUtils.KEY_HEIGHT);
-        prefsEditor.apply();
-        Log.e("height", String.valueOf(PreferenceUtils.getHeight(context)));
-    }
-
-    public void clearEmailPreference(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor prefsEditor = preferences.edit();
-        prefsEditor.remove(PreferenceUtils.KEY_EMAIL);
-        prefsEditor.apply();
-    }
-
 }
 
 

@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context="com.example.sveto.zavrsnirad.RegisterActivity">
 
+    <include layout="@layout/app_bar_main"/>
+
     <EditText
         android:id="@+id/etEmail"
         style="@style/EditTextRegisterActivity"
@@ -16,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivRegisterActivity"
-        app:layout_constraintVertical_bias="0.169" />
+        app:layout_constraintVertical_bias="0.067" />
 
     <EditText
         android:id="@+id/etPassword"
@@ -43,7 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.081"
+        app:layout_constraintVertical_bias="0.171"
         app:srcCompat="@drawable/fitbit_logo" />
 
     <Button

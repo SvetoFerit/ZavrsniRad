@@ -1,11 +1,13 @@
 package com.example.sveto.zavrsnirad.connection;
 
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import android.util.Log;
@@ -19,10 +21,13 @@ import android.widget.Toast;
 
 import com.example.sveto.zavrsnirad.CalculationActivity;
 import com.example.sveto.zavrsnirad.R;
-import com.example.sveto.zavrsnirad.Utils.FitbitUtils;
-import com.example.sveto.zavrsnirad.Utils.TextViewSyncCallback;
+import com.example.sveto.zavrsnirad.utils.FitbitUtils;
+import com.example.sveto.zavrsnirad.utils.TextViewSyncCallback;
 import com.example.sveto.zavrsnirad.models.FitbitParameters;
 
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,8 +52,6 @@ public class ConnectFitbitActivity extends AppCompatActivity implements View.OnC
         ButterKnife.bind(this);
         btnConnectFitbit.setOnClickListener(this);
 
-        Log.e("create", "crataeConnect");
-
         getFitbibtParameters();
 
     }
@@ -58,20 +61,39 @@ public class ConnectFitbitActivity extends AppCompatActivity implements View.OnC
         switch (v.getId()) {
             case R.id.btn_ConnectFitbit: {
                 if (connectedToInternet()) {
-                    connectToFitbit();
+                    final ProgressDialog progressBar = new ProgressDialog(ConnectFitbitActivity.this);
+                    progressBar.setMessage("Connecting....");
+                    progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progressBar.show();
+                    final Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressBar.dismiss();
+                            Toast.makeText(ConnectFitbitActivity.this, "You are successfully connected", Toast.LENGTH_SHORT).show();
+                        }
+                    }, 3000);
+
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            connectToFitbit();
+                        }
+                    }, 4000);
                 }
             }
 
         }
     }
 
-
     public void connectToFitbit() {
 
-        Intent intent = new Intent(ConnectFitbitActivity.this, CalculationActivity.class);
-        intent.putExtra(EXTRA_STEPS, FitbitParameters.STEPS);
-        intent.putExtra(EXTRA_CALORIES, FitbitParameters.CALORIES);
-        startActivity(intent);
+                    Intent intent = new Intent(ConnectFitbitActivity.this, CalculationActivity.class);
+                    intent.putExtra(EXTRA_STEPS, FitbitParameters.STEPS);
+                    intent.putExtra(EXTRA_CALORIES, FitbitParameters.CALORIES);
+                    startActivity(intent);
+
+
     }
 
     public boolean connectedToInternet() {

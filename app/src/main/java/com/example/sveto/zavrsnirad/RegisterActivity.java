@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.sveto.zavrsnirad.Utils.PreferenceUtils;
+import com.example.sveto.zavrsnirad.utils.PreferenceUtils;
 import com.example.sveto.zavrsnirad.database.UserDbHelper;
 
 import butterknife.BindView;

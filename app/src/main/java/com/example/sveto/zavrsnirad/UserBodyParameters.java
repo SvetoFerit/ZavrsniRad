@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.sveto.zavrsnirad.Utils.PreferenceUtils;
+import com.example.sveto.zavrsnirad.utils.PreferenceUtils;
 import com.example.sveto.zavrsnirad.connection.ConnectFitbitActivity;
 
 import butterknife.BindView;

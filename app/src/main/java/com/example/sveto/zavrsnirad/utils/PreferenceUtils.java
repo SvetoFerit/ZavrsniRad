@@ -93,4 +93,26 @@ public class PreferenceUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(KEY_YEARS, 0);
     }
+
+    public static void clearHeightPreference(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        prefsEditor.remove(PreferenceUtils.KEY_HEIGHT);
+        prefsEditor.apply();
+
+    }
+
+    public static void clearEmailPreference(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        prefsEditor.remove(PreferenceUtils.KEY_EMAIL);
+        prefsEditor.apply();
+    }
+
+    public static void clearCounterPreference(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor prefsEditor = preferences.edit();
+        prefsEditor.remove(PreferenceUtils.KEY_COUNTER);
+        prefsEditor.apply();
+    }
 }
