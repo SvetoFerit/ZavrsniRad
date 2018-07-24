@@ -1,4 +1,4 @@
-package com.example.sveto.zavrsnirad.Utils;
+package com.example.sveto.zavrsnirad.utils;
 
 public interface TextViewSyncCallback {
     void textViewCallback();

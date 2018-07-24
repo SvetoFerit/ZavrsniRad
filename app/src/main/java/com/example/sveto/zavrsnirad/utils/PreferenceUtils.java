@@ -1,4 +1,4 @@
-package com.example.sveto.zavrsnirad.Utils;
+package com.example.sveto.zavrsnirad.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
