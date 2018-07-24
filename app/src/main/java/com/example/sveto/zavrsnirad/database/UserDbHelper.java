@@ -5,13 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.os.Build;
 
 
 import com.example.sveto.zavrsnirad.models.User;
 import com.example.sveto.zavrsnirad.models.UserContract.*;
 
-import java.util.ArrayList;
 
 /**
  * Created by Sveto on 12.4.2018..
@@ -22,7 +20,6 @@ public class UserDbHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "User.db";
     private static final int DATABASE_VERSION = 1;
     private SQLiteDatabase db;
-
 
 
     public UserDbHelper(Context context) {
@@ -53,23 +50,28 @@ public class UserDbHelper extends SQLiteOpenHelper {
     }
 
 
-
-
-
     public boolean addUser(User user) {
-         db = this.getWritableDatabase();
+        db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
         cv.put(UserTable.COLUMN_USERNAME, user.getUsername());
         cv.put(UserTable.COLUMN_EMAIL, user.getEmail());
         cv.put(UserTable.COLUMN_PASSWORD, user.getPassword());
 
-       long result= db.insert(UserTable.TABLE_NAME, null, cv);
-        if(result==-1){return false;}
-        else {return true;}
-
-
+        long result = db.insert(UserTable.TABLE_NAME, null, cv);
+        if (result == -1) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
+
+    public Cursor getUser() {
+        db = this.getReadableDatabase();
+        Cursor cursor = db.query(UserTable.TABLE_NAME, null, null, null, null, null, null, null);
+        return cursor;
+
+    }
 
 }

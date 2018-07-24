@@ -1,9 +1,9 @@
 package com.example.sveto.zavrsnirad;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -50,6 +50,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         button.setOnClickListener(this);
         tvAlreadySignUp.setOnClickListener(this);
 
+
     }
 
     @Override
@@ -76,25 +77,34 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.button:
                 if (validate()) {
                     User user = new User(username, email, password);
-                   boolean adduser= userDbHelper.addUser(user);
-                   if(adduser) {
-                       Toast.makeText(this, "You are successfully signed up", Toast.LENGTH_SHORT).show();
-                       Log.e("insert","inserted");
-                       Intent intent=new Intent(this,RegisterActivity.class);
-                       intent.putExtra(EXTRA_EMAIL,email);
-                       intent.putExtra(EXTRA_PASSWORD,password);
-                       startActivity(intent);
+                    Cursor cursor = userDbHelper.getUser();
+                    if (cursor.getCount() == 0) {
+                        boolean adduser = userDbHelper.addUser(user);
+                    }
+                    while (cursor.moveToNext()) {
+                        if (email.equals(cursor.getString(2)) || password.equals(cursor.getString(3))) {
+                            Toast.makeText(this, "User already exists! ", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                    boolean adduser = userDbHelper.addUser(user);
 
-
-                   }else{
-                       Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-                   }
+                    if (adduser) {
+                        Toast.makeText(this, "You are successfully signed up", Toast.LENGTH_SHORT).show();
+                        Log.e("insert", "inserted");
+                        Log.e("USER", user.getEmail());
+                        Intent intent = new Intent(this, RegisterActivity.class);
+                        intent.putExtra(EXTRA_EMAIL, email);
+                        intent.putExtra(EXTRA_PASSWORD, password);
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
-            break;
+                break;
             case R.id.tvAlreadySignUp:
                 startActivity(new Intent(this, RegisterActivity.class));
-            break;
+                break;
         }
     }
 
@@ -108,8 +118,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         if (username.isEmpty() || email.isEmpty() || password.isEmpty() || confirmpassword.isEmpty()) {
             Toast.makeText(this, "Please enter all the details", Toast.LENGTH_SHORT).show();
-        }
-        else if (!confirmpassword.equals(password)) {
+        } else if (!confirmpassword.equals(password)) {
             Toast.makeText(this, "Incorrect confirmed password", Toast.LENGTH_SHORT).show();
         } else {
             result = true;

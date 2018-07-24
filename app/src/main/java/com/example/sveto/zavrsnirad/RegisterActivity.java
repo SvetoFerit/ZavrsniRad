@@ -1,8 +1,12 @@
 package com.example.sveto.zavrsnirad;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -11,10 +15,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sveto.zavrsnirad.Utils.PreferenceUtils;
+import com.example.sveto.zavrsnirad.database.UserDbHelper;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.sveto.zavrsnirad.SignUpActivity.*;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -33,10 +39,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @BindView(R.id.textView)
     TextView textView;
 
-    String email, password, extra_Email, extra_Password;
+    String email, password;
 
-    Boolean logged = false;
-
+    UserDbHelper userDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +50,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         ButterKnife.bind(this);
         btnSignUp.setOnClickListener(this);
         btnLogIn.setOnClickListener(this);
+        userDbHelper = new UserDbHelper(this);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setIcon(R.drawable.feritos);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+
+        if (PreferenceUtils.getEmail(this) != null) {
+            Intent intent = new Intent(RegisterActivity.this, UserBodyParameters.class);
+            startActivity(intent);
+        }
 
     }
 
@@ -56,47 +73,65 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 break;
             case R.id.btnLogIn:
                 if (validate()) {
-                    startActivity(new Intent(RegisterActivity.this, SecondActivity.class));
-                    logged = true;
+                    if (checkBox.isChecked()) {
+                        PreferenceUtils.saveEmail(email, this);
+                        PreferenceUtils.savePassword(password, this);
+                    }
+                    startActivity(new Intent(RegisterActivity.this, UserBodyParameters.class));
                 }
 
                 break;
-
-
         }
 
     }
 
     private boolean validate() {
         Boolean result = false;
+        int size = 0;
+        int countEmail = 0;
+        int countPassword = 0;
 
         email = etEmail.getText().toString();
         password = etPassword.getText().toString();
 
-        extra_Password = getIntent().getStringExtra(EXTRA_PASSWORD);
-        extra_Email = getIntent().getStringExtra(EXTRA_EMAIL);
-
-        if (email.equals(extra_Email) && password.equals(extra_Password)) {
-            result = true;
-        } else if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Please enter all the details", Toast.LENGTH_SHORT).show();
-        } else if (!email.equals(extra_Email) && !password.equals(extra_Password)) {
-            Toast.makeText(this, "Incorrect email and password!", Toast.LENGTH_SHORT).show();
-        } else if (!email.equals(extra_Email)) {
-            Toast.makeText(this, "Incorrect email!", Toast.LENGTH_SHORT).show();
+        Cursor cu = userDbHelper.getUser();
+        if (cu.getCount() == 0) {
+            Toast.makeText(this, "No data in database", Toast.LENGTH_SHORT).show();
         } else {
+            while (cu.moveToNext()) {
+                size++;
+                if (email.equals(cu.getString(2)) && password.equals(cu.getString(3))) {
+                    result = true;
+                }
+                if (!email.equals(cu.getString(2))) {
+                    countEmail++;
+
+                }
+                if (!password.equals(cu.getString(3))) {
+                    countPassword++;
+                }
+
+                Log.e("INDEX", cu.getString(0));
+                Log.e("USERNAME", cu.getString(1));
+                Log.e("EMAIL", cu.getString(2));
+                Log.e("PASSWORD", cu.getString(3));
+                Log.e("size", String.valueOf(size));
+                Log.e("size", String.valueOf(countEmail));
+                Log.e("size", String.valueOf(countPassword));
+
+            }
+
+        }
+        if (countEmail == size && countPassword == size) {
+            Toast.makeText(this, "Incorrect email and password!", Toast.LENGTH_SHORT).show();
+        } else if (countEmail == size || countEmail > countPassword) {
+            Toast.makeText(this, "Incorrect email!", Toast.LENGTH_SHORT).show();
+        } else if (countPassword == size || countEmail < countPassword) {
             Toast.makeText(this, "Incorrect password!", Toast.LENGTH_SHORT).show();
         }
 
+        cu.close();
         return result;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (logged) {
-            startActivity(new Intent(RegisterActivity.this, SecondActivity.class));
-        }
-
-    }
 }

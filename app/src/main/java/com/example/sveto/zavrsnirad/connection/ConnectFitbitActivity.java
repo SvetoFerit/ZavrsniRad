@@ -1,27 +1,28 @@
 package com.example.sveto.zavrsnirad.connection;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
+
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+
 import android.widget.Button;
-import android.widget.ListView;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.sveto.zavrsnirad.R;
 
-import java.util.ArrayList;
-import java.util.Set;
+import com.example.sveto.zavrsnirad.CalculationActivity;
+import com.example.sveto.zavrsnirad.R;
+import com.example.sveto.zavrsnirad.Utils.FitbitUtils;
+import com.example.sveto.zavrsnirad.Utils.TextViewSyncCallback;
+import com.example.sveto.zavrsnirad.models.FitbitParameters;
+
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -29,41 +30,14 @@ import butterknife.ButterKnife;
 public class ConnectFitbitActivity extends AppCompatActivity implements View.OnClickListener {
 
 
-    @BindView(R.id.btnConnectFitbit)
+    @BindView(R.id.btn_ConnectFitbit)
     Button btnConnectFitbit;
-    @BindView(R.id.lvDevices)
-    ListView lvDevices;
 
-    private BluetoothAdapter bluetoothAdapter;
-    
-    public static final int DISCOVERY_REQUEST = 1;
+    @BindView(R.id.tvNet)
+    TextView tvNet;
 
-
-    BroadcastReceiver bluetoothState = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String stateExtra = BluetoothAdapter.EXTRA_STATE;
-            int state = intent.getIntExtra(stateExtra, -1);
-            switch (state) {
-                case (BluetoothAdapter.STATE_TURNING_ON): {
-                    Toast.makeText(ConnectFitbitActivity.this, "Bluetooth is turning ON", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case (BluetoothAdapter.STATE_ON): {
-                    Toast.makeText(ConnectFitbitActivity.this, "Bluetooth is ON", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case (BluetoothAdapter.STATE_TURNING_OFF): {
-                    Toast.makeText(ConnectFitbitActivity.this, "Bluetooth is turning OFF", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case (BluetoothAdapter.STATE_OFF): {
-                    Toast.makeText(ConnectFitbitActivity.this, "Bluetooth is OFF", Toast.LENGTH_SHORT).show();
-                    break;
-                }
-            }
-        }
-    };
+    public static String EXTRA_STEPS = "extra_steps";
+    public static String EXTRA_CALORIES = "extra_calories";
 
 
     @Override
@@ -73,14 +47,20 @@ public class ConnectFitbitActivity extends AppCompatActivity implements View.OnC
         ButterKnife.bind(this);
         btnConnectFitbit.setOnClickListener(this);
 
+        Log.e("create", "crataeConnect");
+
+        getFitbibtParameters();
 
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btnConnectFitbit:
-                connectToFitbit();
+            case R.id.btn_ConnectFitbit: {
+                if (connectedToInternet()) {
+                    connectToFitbit();
+                }
+            }
 
         }
     }
@@ -88,72 +68,49 @@ public class ConnectFitbitActivity extends AppCompatActivity implements View.OnC
 
     public void connectToFitbit() {
 
-        Log.e("List", "List");
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        String scanModeChanged = BluetoothAdapter.ACTION_SCAN_MODE_CHANGED;
-        String beDiscoverable = BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE;
-        IntentFilter filter = new IntentFilter(scanModeChanged);
-        registerReceiver(bluetoothState, filter);
-        startActivityForResult(new Intent(beDiscoverable), DISCOVERY_REQUEST);
-
-        Log.e("ispiši", "ispiši");
+        Intent intent = new Intent(ConnectFitbitActivity.this, CalculationActivity.class);
+        intent.putExtra(EXTRA_STEPS, FitbitParameters.STEPS);
+        intent.putExtra(EXTRA_CALORIES, FitbitParameters.CALORIES);
+        startActivity(intent);
     }
 
+    public boolean connectedToInternet() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == DISCOVERY_REQUEST) {
-            Toast.makeText(this, "Discovery in progress", Toast.LENGTH_SHORT).show();
-            findDevices();
-        }
-    }
-
-    private void findDevices() {
-        BluetoothDevice remoteDevice = null;
-        String lastUsedRemoteDevice = getLastUsedRemoteBTDevice();
-        if (lastUsedRemoteDevice != null) {
-            Toast.makeText(this, "Checking for known paired devices,namely: " + lastUsedRemoteDevice, Toast.LENGTH_SHORT).show();
-            Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
-            for (BluetoothDevice pairedDevice : pairedDevices) {
-                if (pairedDevice.getAddress().equals(lastUsedRemoteDevice)) {
-                    Toast.makeText(this, "Found device: " + pairedDevice.getName() + "@" + lastUsedRemoteDevice, Toast.LENGTH_SHORT).show();
-                    remoteDevice = pairedDevice;
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo.getTypeName().equalsIgnoreCase("WIFI")) {
+                if (netInfo.isConnected()) {
+                    haveConnectedWifi = true;
                 }
             }
-        }
-        if (remoteDevice == null) {
-            Toast.makeText(this, "Starting discovery for remote devices...", Toast.LENGTH_SHORT).show();
-            if (bluetoothAdapter.startDiscovery()) {
-                Toast.makeText(this, "Discovery thread started...Scanning for devices", Toast.LENGTH_SHORT).show();
-                registerReceiver(discoveryResult, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+            if (netInfo.getTypeName().equalsIgnoreCase("MOBILE")) {
+                if (netInfo.isConnected()) {
+                    haveConnectedMobile = true;
+                }
             }
+        } catch (NullPointerException e) {
+            Toast.makeText(this, "No internet connection", Toast.LENGTH_SHORT).show();
         }
-
+        return haveConnectedWifi || haveConnectedMobile;
     }
 
-    BroadcastReceiver discoveryResult = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String remoteDeviceName = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
-            BluetoothDevice remoteDevice;
-            remoteDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            Toast.makeText(ConnectFitbitActivity.this, "Discovered: " + remoteDeviceName, Toast.LENGTH_SHORT).show();
-        }
-    };
+    public void getFitbibtParameters() {
 
+        FitbitUtils.sync(this, new TextViewSyncCallback() {
+            @Override
+            public void textViewCallback() {
+                String data = "";
+                data += "Score: " + FitbitParameters.STEPS +
+                        "Calories : " + FitbitParameters.CALORIES;
 
-    private String getLastUsedRemoteBTDevice() {
-        SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-        String result = prefs.getString("LAST_REMOTE_DEVICE_ADDRESS", null);
-        return result;
+                tvNet.setText(data);
+            }
+        });
+
     }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(bluetoothState);
-    }
-
-
 }
+
+

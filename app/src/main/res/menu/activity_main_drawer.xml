@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_sync"
+            android:icon="@drawable/sync_icon_18dp"
+            android:title="@string/nav_sync" />
+        <item
+            android:id="@+id/nav_set_weight_and_height"
+            android:icon="@drawable/set_weight_and_height_icon_18dp"
+            android:title="@string/nav_set_weight_and_height" />
+
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@drawable/logout_icon_18dp"
+            android:title="@string/nav_logout" />
+
+    </group>
+
+</menu>
