@@ -66,7 +66,6 @@ public class UserBodyParameters extends AppCompatActivity {
                     PreferenceUtils.saveWeight(finalWeight, UserBodyParameters.this);
                     PreferenceUtils.saveHeight(finalHeight, UserBodyParameters.this);
                     PreferenceUtils.saveYears(finalYears, UserBodyParameters.this);
-                    Log.e("counter", String.valueOf(PreferenceUtils.getCounter(UserBodyParameters.this)));
                     if (PreferenceUtils.getCounter(UserBodyParameters.this) == 0) {
                         startActivity(new Intent(UserBodyParameters.this, ConnectFitbitActivity.class));
                     } else {
@@ -74,7 +73,6 @@ public class UserBodyParameters extends AppCompatActivity {
                     }
                     counter++;
                     PreferenceUtils.saveCounter(counter, UserBodyParameters.this);
-                    Log.e("counter", String.valueOf(PreferenceUtils.getCounter(UserBodyParameters.this)));
                 }
             }
         });

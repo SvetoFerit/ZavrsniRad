@@ -11,13 +11,13 @@ public class PreferenceUtils {
     private static String KEY_WEIGHT = "weight";
     public static String KEY_HEIGHT = "height";
     private static String KEY_YEARS = "years";
-    private static String KEY_COUNTER="counter";
+    private static String KEY_COUNTER = "counter";
 
     public PreferenceUtils() {
     }
 
 
-    public static boolean saveCounter(int counter,Context context){
+    public static boolean saveCounter(int counter, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor prefsEditor = prefs.edit();
         prefsEditor.putInt(KEY_COUNTER, counter);
@@ -29,7 +29,6 @@ public class PreferenceUtils {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getInt(KEY_COUNTER, 0);
     }
-
 
 
     public static boolean saveEmail(String email, Context context) {

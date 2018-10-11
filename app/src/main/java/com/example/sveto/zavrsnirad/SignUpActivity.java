@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -96,18 +95,13 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
                     if (adduser) {
                         Toast.makeText(this, "You are successfully signed up", Toast.LENGTH_SHORT).show();
-                        Log.e("insert", "inserted");
-                        Log.e("USER", user.getEmail());
                         PreferenceUtils.clearHeightPreference(SignUpActivity.this);
                         PreferenceUtils.clearCounterPreference(SignUpActivity.this);
                         startActivity(new Intent(SignUpActivity.this, RegisterActivity.class));
                     } else {
-
-
                         Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
                     }
                 }
-
                 break;
             case R.id.tvAlreadySignUp:
                 startActivity(new Intent(this, RegisterActivity.class));

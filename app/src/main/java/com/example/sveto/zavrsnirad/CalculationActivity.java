@@ -13,23 +13,33 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.sveto.zavrsnirad.connection.Config;
+import com.example.sveto.zavrsnirad.connection.FitbitInterface;
 import com.example.sveto.zavrsnirad.utils.FitbitUtils;
 import com.example.sveto.zavrsnirad.utils.PreferenceUtils;
 import com.example.sveto.zavrsnirad.utils.TextViewSyncCallback;
 import com.example.sveto.zavrsnirad.connection.ConnectFitbitActivity;
 import com.example.sveto.zavrsnirad.models.FitbitParameters;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class CalculationActivity extends AppCompatActivity {
@@ -81,11 +91,15 @@ public class CalculationActivity extends AppCompatActivity {
 
         setParameters();
         calculation();
+
+
+
+
     }
 
     private void loadNavHeader() {
         txtName.setText("Svetozar Radić");
-        txtWebsite.setText("sveto1997@gmail.com");
+        txtWebsite.setText("sradic@etfos.hr");
     }
 
 
@@ -219,7 +233,7 @@ public class CalculationActivity extends AppCompatActivity {
                 alert.setTitle("Upozorenje!");
                 alert.setPositiveButton("OK", null);
                 if (recommended_calories != FitbitParameters.CALORIES && (recommended_kilometers != 0.414f * (height / 100000) * FitbitParameters.STEPS)) {
-                    alert.setMessage("Preporučen broj potrošenih kalorija i pređenih kilometara nije ostvaren!");
+                    alert.setMessage("Preporučen broj potrošenih kalorija, pređenih kilometara i koraka nije ostvaren!");
                     alert.show();
                 } else if (recommended_kilometers != 0.414f * (height / 100000) * FitbitParameters.STEPS) {
                     alert.setMessage("Preporučeni broj kilometara i koraka nije ostvaren!");

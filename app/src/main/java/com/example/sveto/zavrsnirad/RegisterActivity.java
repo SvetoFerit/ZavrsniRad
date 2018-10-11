@@ -79,7 +79,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     }
                     startActivity(new Intent(RegisterActivity.this, UserBodyParameters.class));
                 }
-
                 break;
         }
 
@@ -96,7 +95,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         Cursor cu = userDbHelper.getUser();
         if (cu.getCount() == 0) {
-            Toast.makeText(this, "No data in database", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "You must first sign up!", Toast.LENGTH_SHORT).show();
+
         } else {
             while (cu.moveToNext()) {
                 size++;
@@ -110,25 +110,16 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 if (!password.equals(cu.getString(3))) {
                     countPassword++;
                 }
-
-                Log.e("INDEX", cu.getString(0));
-                Log.e("USERNAME", cu.getString(1));
-                Log.e("EMAIL", cu.getString(2));
-                Log.e("PASSWORD", cu.getString(3));
-                Log.e("size", String.valueOf(size));
-                Log.e("size", String.valueOf(countEmail));
-                Log.e("size", String.valueOf(countPassword));
-
             }
+            if (countEmail == size && countPassword == size) {
+                Toast.makeText(this, "Incorrect email and password!", Toast.LENGTH_SHORT).show();
+            } else if (countEmail == size || countEmail > countPassword) {
+                Toast.makeText(this, "Incorrect email!", Toast.LENGTH_SHORT).show();
+            } else if (countPassword == size || countEmail < countPassword) {
+                Toast.makeText(this, "Incorrect password!", Toast.LENGTH_SHORT).show();
+            }
+        }
 
-        }
-        if (countEmail == size && countPassword == size) {
-            Toast.makeText(this, "Incorrect email and password!", Toast.LENGTH_SHORT).show();
-        } else if (countEmail == size || countEmail > countPassword) {
-            Toast.makeText(this, "Incorrect email!", Toast.LENGTH_SHORT).show();
-        } else if (countPassword == size || countEmail < countPassword) {
-            Toast.makeText(this, "Incorrect password!", Toast.LENGTH_SHORT).show();
-        }
 
         cu.close();
         return result;

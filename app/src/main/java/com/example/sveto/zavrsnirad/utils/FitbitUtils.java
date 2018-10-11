@@ -1,81 +1,90 @@
 package com.example.sveto.zavrsnirad.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 import com.example.sveto.zavrsnirad.connection.Config;
-import com.example.sveto.zavrsnirad.connection.Singleton;
+import com.example.sveto.zavrsnirad.connection.FitbitInterface;
+
 import com.example.sveto.zavrsnirad.models.FitbitParameters;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import static com.example.sveto.zavrsnirad.connection.Config.USER_ID;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 
 public class FitbitUtils {
 
-
-    public static void sync(Context context, final TextViewSyncCallback TextViewSyncCallback) {
+    public static void sync(final Context context, final TextViewSyncCallback TextViewSyncCallback) {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String date = df.format(Calendar.getInstance().getTime());
 
+        Retrofit.Builder builder = new Retrofit.Builder()
+                .baseUrl("https://api.fitbit.com/")
+                .addConverterFactory(GsonConverterFactory.create());
 
-        Log.e("date", date);
-
-        String url = "https://api.fitbit.com/1/user/" + USER_ID + "/activities/date/" + date + ".json";
-
-        Log.e("link for api", url);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        Retrofit retrofit = builder.build();
+        FitbitInterface fitbitInterface = retrofit.create(FitbitInterface.class);
+        Call<FitbitParameters> call = fitbitInterface.getFitbitParameters(date,Config.TOKEN);
+        call.enqueue(new Callback<FitbitParameters>() {
             @Override
-            public void onResponse(JSONObject response) {
-
-                try {
-                    Log.e("Json object", String.valueOf(response));
-                    JSONObject obj = response.getJSONObject("summary");
-
-                    FitbitParameters.STEPS = obj.getInt("steps");
-                    FitbitParameters.CALORIES = obj.getInt("caloriesOut");
+            public void onResponse( Call<FitbitParameters>  call, retrofit2.Response<FitbitParameters> response) {
+                if (response.isSuccessful()) {
+                    FitbitParameters.STEPS = response.body().getSummary().getSteps();
+                    FitbitParameters.CALORIES = response.body().getSummary().getCaloriesOut();
+                    Log.d("steps",String.valueOf(response.body().getSummary().getSteps()));
 
                     TextViewSyncCallback.textViewCallback();
-
-
-                } catch (JSONException e) {
-                    Log.e("exception", "enter");
-                    Log.e("exception", e.getMessage());
-                    e.printStackTrace();
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("error", "response");
-                Log.e("error", error.toString());
 
             }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<>();
 
-                headers.put("Authorization", "Bearer " + Config.TOKEN);
-                return headers;
+            @Override
+            public void onFailure(Call<FitbitParameters> call, Throwable t) {
+                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+
             }
-        };
-        Singleton.getInstance(context).addToRequestqueue(jsonObjectRequest);
+        });
+
 
     }
 
+
+    public static boolean connectedToInternet(Context context) {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
+
+
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo.getTypeName().equalsIgnoreCase("WIFI")) {
+                if (netInfo.isConnected()) {
+                    haveConnectedWifi = true;
+                }
+            }
+            if (netInfo.getTypeName().equalsIgnoreCase("MOBILE")) {
+                if (netInfo.isConnected()) {
+                    haveConnectedMobile = true;
+                }
+            }
+        } catch (NullPointerException e) {
+            //Toast.makeText(context, "No internet connection", Toast.LENGTH_SHORT).show();
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
+
 }
+
